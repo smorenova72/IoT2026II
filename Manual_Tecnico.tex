@@ -1,0 +1,494 @@
+%===============================================================================================================%
+%                    Estilo y paquetes que se van a utilizar: No es necesario editar                            %
+%===============================================================================================================%
+\documentclass[12pt,letterpaper]{article}     % Tipo de documento y otras especificaciones
+\usepackage[utf8]{inputenc}                   % Para escribir tildes y eñes
+\usepackage[spanish]{babel}                   % Para que los títulos de figuras, tablas y otros estén en español
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}					% Cambiar nombre a tablas
+\addto\captionsspanish{\renewcommand{\listtablename}{Índice de tablas}}		% Cambiar nombre a lista de tablas
+\usepackage{geometry}                          
+\geometry{left=18mm,right=18mm,top=21mm,bottom=21mm}	 % Tamaño del área de escritura de la página
+\usepackage{ucs}
+\usepackage{amsmath}      % Los paquetes ams son desarrollados por la American Mathematical Society
+\usepackage{amsfonts}     % y mejoran la escritura de fórmulas y símbolos matemáticos.
+\usepackage{tikz}
+
+\usetikzlibrary{babel}               % Se añade para que se acepten algunos caractéres en el circuitikz 
+\usepackage{circuitikz}
+\usepackage{graphicx}     % Para insertar gráficas
+\usepackage[lofdepth,lotdepth]{subfig}	% Para colocar varias figuras
+\usepackage{unitsdef}	  % Para la presentación correcta de unidades
+\usepackage{pdfpages}     % Incluir paginas de pdf externo, para los anexos
+\usepackage{appendix}     % Para los anexos
+\renewcommand{\unitvaluesep}{\hspace*{4pt}}	% Redimensionamiento del espacio entre magnitud y unidad
+\usepackage[colorlinks=true,urlcolor=blue,linkcolor=black,citecolor=red]{hyperref}     % Para insertar marcadores
+\usepackage{float}		% Para ubicar las tablas y figuras justo después del texto
+\usepackage{booktabs}	% Para hacer tablas más estilizadas
+\batchmode
+\usepackage{apalike}
+\bibliographystyle{apalike}  % Bibliografía en formato IEEE
+\pagestyle{plain} 
+\pagenumbering{arabic}
+\usepackage{lastpage}
+\usepackage{skull}
+\usepackage{marvosym}
+\usepackage{fancyhdr}	% Para manejar los encabezados y pies de página
+\pagestyle{fancy}		% Contenido de los encabezados y pies de pagina
+\usepackage{multicol}   % Para varias columnas
+\usepackage{enumerate}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstset{
+  language=C++,
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{blue}\bfseries,
+  commentstyle=\color{gray}\ttfamily,
+  stringstyle=\color{red!70!black},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  stepnumber=1,
+  numbersep=5pt,
+  backgroundcolor=\color{gray!10},
+  frame=single,
+  rulecolor=\color{black},
+  captionpos=b,
+  breaklines=true,
+  breakatwhitespace=false,
+  tabsize=2,
+  showstringspaces=false
+}
+
+%===============================================================================================================%
+%                         Definición del ambiente: Resumen                                                      %   
+%===============================================================================================================%
+\newcounter{resumen}
+\setcounter{resumen}{0}
+\def\theejemplo{\thechapter.\arabic{resumen}}
+
+\newenvironment{resumen}
+{	
+	\begin{center}
+	\begin{minipage}[t]{500 pt}
+	\vspace{1mm}
+	\emph{\textbf{}}
+	\\[-2mm]
+	\line(1,0){500}
+	\\[-4.25 mm]
+	\line(1,0){500}
+	\\
+}
+{
+	\normalsize
+	\\[2mm]
+	\footnotesize\textbf{Palabras clave: \footnotesize\@palabras}
+	\\[-2mm]
+	\line(1,0){500}
+	\\[0.5cm]
+	\end{minipage}
+	\end{center}
+}
+
+%===============================================================================================================%
+%                         Definición del ambiente: Palabras clave                                               %
+%===============================================================================================================%
+\def\palabras#1{\gdef\@palabras{#1}}
+
+%===============================================================================================================%
+%             Definición de encabezados                                                                         %
+%===============================================================================================================%
+\lhead{IoT - Arquitectura de Sistemas} 
+\chead{}
+\rhead{Manual Técnico}	
+\lfoot{Programa de Ingeniería Electrónica y Sistemas}
+\cfoot{\thepage\ de \pageref{LastPage}}
+\rfoot{Universidad Católica de Oriente}
+
+%===============================================================================================================%
+% Portada                                                                                                       %
+%===============================================================================================================%
+\author{Santiago Barbarán, 1.001.159.841\\Miguel Angel Botero, 1.023.523.241\\Sebastian Moreno, 1.001.724.352 \\Profesor: Juan Camilo Acevedo \vspace*{2.8in}}
+\title{
+\begin{minipage}{\textwidth}
+\centering
+	\includegraphics[width=0.3\textwidth]{uco.png}
+	\bigskip
+\end{minipage}\\
+Universidad Católica de Oriente \\{\small Facultad de Ingeniería\\Programa de Ingeniería Electrónica y Sistemas\\ Manual Técnico\\Semestre 2026-II\\\vspace*{0.55in} Documentación Técnica:}\\ Manual Tecnico\vspace*{1.35in}}
+
+\begin{document}	% Inicio del documento
+
+\pdfbookmark[1]{Portada}{portada} 	% Marcador para el título
+
+\maketitle							% Título
+\thispagestyle{empty}
+
+\tableofcontents         % Tabla de contenidos
+\newpage
+
+\palabras{IoT, RP2040, Raspberry Pi 5, MQTT, TLS X.509, Mosquitto, Grafana, Electroválvula, Contactor.}
+
+\begin{resumen}
+Este manual técnico documenta el diseño, la arquitectura hardware/software y el protocolo de despliegue del sistema IoT para monitoreo y control automatizado de piscicultura. La arquitectura está dividida en cinco capas bien definidas: Capa de Percepción (sensores de conductividad/SDT y nivel JSN-SR04T), Capa de Nodos Perimetrales (microcontrolador RP2040 con lógica de control local), Capa de Red y Procesamiento (Gateway local Raspberry Pi 5 ejecutando broker MQTT Mosquitto), Capa Nube (transmisión segura bajo TLS/X.509) y Capa de Aplicación (Dashboard Grafana/Web Application para visualización en tiempo real). Se detallan los esquemáticos electrónicos, aislamiento galvánico de cargas de 110V AC mediante optoacopladores y relés/contactores, además de las configuraciones de software y scripts de ingesta.
+\end{resumen}
+
+\section{Introducción}
+El monitoreo continuo de parámetros fisicoquímicos e hidráulicos en tanques de piscicultura es fundamental para mitigar la mortalidad de peces y optimizar la calidad del agua. El presente sistema IoT integra un esquema distribuido donde nodos de campo basados en la plataforma Raspberry Pi Pico (RP2040) adquieren variables de conductividad y nivel, ejecutando el control local de actuadores de 110V AC (bombas de recirculación y electroválvulas) mientras transmiten datos hacia un Gateway local centralizado basado en Raspberry Pi 5.
+
+\section{Arquitectura del Sistema}
+La arquitectura tecnológica del sistema sigue un modelo multicapa estructurado de la siguiente forma:
+
+\subsection{Capa de Percepción / Campo}
+\begin{itemize}
+    \item \textbf{Sensor Ultrasónico de Nivel JSN-SR04T:} Módulo impermeable que mide la distancia al nivel libre de agua del estanque mediante interfaz serial UART/GPIO.
+    \item \textbf{Conductivímetro / Sensor de SDT:} Módulo analógico equipado con electrodos que entrega una señal de voltaje proporcional a la concentración de Sólidos Disueltos Totales en el agua, conectada a los canales ADC del RP2040.
+\end{itemize}
+
+\subsection{Capa de Nodos Perimetrales}
+\begin{itemize}
+    \item \textbf{Microcontrolador RP2040 (Raspberry Pi Pico):} Procesa localmente las lecturas de los sensores, aplica filtros digitales y ejecuta decisiones de control local autónomo (activación de electroválvulas de drenaje/ingreso y bombas de recirculación).
+\end{itemize}
+
+\subsection{Capa de Red y Procesamiento (Gateway Local)}
+\begin{itemize}
+    \item \textbf{Raspberry Pi 5:} Actúa como servidor y gateway local, hospedando el Broker MQTT Mosquitto con mecanismos de autenticación y cifrado TLS/X.509.
+    \item \textbf{Servicios locales:} Ejecución de base de datos de series temporales y motor de ingesta de datos.
+\end{itemize}
+
+\subsection{Capa Nube y Aplicación}
+\begin{itemize}
+    \item \textbf{Dashboard Grafana / Web Application:} Interfaz de usuario para visualización gráfica de métricas en tiempo real, histórico de parámetros y monitoreo del estado de actuadores.
+\end{itemize}
+
+\section{Esquemático y Etapa de Potencia}
+Para evitar el acoplamiento de ruido inductivo procedente de la bomba de recirculación de 110V AC y las electroválvulas hacia el microcontrolador RP2040, se implementa una etapa de aislamiento optoelectrónico basada en optoacopladores MOC3021 o relés optoacoplados de estado sólido.
+
+\begin{figure}[H]
+\centering
+\begin{circuitikz}[scale=1, transform shape]
+    % Microcontrolador RP2040
+    \draw[thick, fill=blue!5] (0,0) rectangle (5.5,5.2);
+    \node at (2.8,4.7) {\textbf{RP2040 (Nodo Sensor)}};
+    \node[right] at (0.2,4) {\footnotesize GP15 $\rightarrow$ TRIG (JSN-SR04T)};
+    \node[right] at (0.2,3.0) {\footnotesize GP14 $\leftarrow$ ECHO (JSN-SR04T)};
+    \node[right] at (0.2,2.2) {\footnotesize ADC0/GP26 $\leftarrow$ Sensor SDT};
+    \node[left] at (4.3,1.4) {\footnotesize GP16 (Carga TDS)};
+    \node[left] at (4.3,0.6) {\footnotesize GP17 (Carga Nivel)};
+
+    % Módulo LoRa SPI
+    \draw[thick, fill=orange!5] (0,6.0) rectangle (6.5,7.5);
+    \node at (3,6.9) {\textbf{LoRa Ra-02 (SPI1)}};
+    \node[right] at (0.2,6.3) {\footnotesize SCK:10 | MOSI:11 | MISO:12 | CS:13};
+
+    % Interconexión RP2040 - LoRa
+    \draw[<->, thick] (2.25,5.2) -- (2.25,6.0);
+
+    % Bloque de Aislamiento y Potencia
+    \draw[thick, fill=green!5] (6.5,0.2) rectangle (11.5,4.5);
+    \node at (9,4.0) {\textbf{Etapa de Aislamiento}};
+    \node at (9,3.4) {\textbf{\& Drivers de Potencia}};
+    \node[right] at (7,2.5) {\footnotesize IN1 (Relé TDS)};
+    \node[right] at (7,1.0) {\footnotesize IN2 (Relé Nivel)};
+
+    % Conexiones Lógicas RP2040 -> Potencia
+    \draw[->, thick, color=blue!80!black] (4.5,1.4) -- (6.5,2.2);
+    \draw[->, thick, color=blue!80!black] (4.5,0.6) -- (6.5,1.0);
+
+    % Cargas en 110V AC
+    \draw[thick, fill=red!5] (12.0,2.0) rectangle (15.2,3.2);
+    \node at (13.6,2.6) {\small Electroválvula};
+    \node[below] at (13.6,2.1) {\footnotesize (110V AC)};
+
+    \draw[thick, fill=red!5] (12.0,0.4) rectangle (15.2,1.6);
+    \node at (13.6,1.0) {\small Bomba Recirc.};
+    \node[below] at (13.6,0.5) {\footnotesize (110V AC)};
+
+    % Salidas hacia cargas AC
+    \draw[->, thick, color=red!70!black] (10.0,2.6) -- (12.0,2.6);
+    \draw[->, thick, color=red!70!black] (10.0,1.0) -- (12.0,1.0);
+\end{circuitikz}
+\caption{Diagrama de bloques simplificado para el nodo RP2040, interfaz LoRa y etapa de potencia aislada.}
+\label{fig:esquematico}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{Asignación de Pines del Microcontrolador RP2040}
+\vspace{2mm}
+\begin{tabular}{llll}
+\toprule
+\textbf{Pin RP2040} & \textbf{Periférico} & \textbf{Dispositivo / Señal} & \textbf{Tipo de Interfaz} \\ \midrule
+GPIO26 (ADC0) & ADC & Sensor de SDT / Conductividad & Analógica (0--3.3V) \\
+GPIO15 & Output & Trigger Sensor Ultrasónico JSN-SR04T & Digital (Salida) \\
+GPIO14 & Input & Echo Sensor Ultrasónico JSN-SR04T & Digital (Entrada) \\
+GPIO16 & Output & Control Optoacoplador Carga TDS & Digital (Salida) \\
+GPIO17 & Output & Control Optoacoplador Carga Nivel & Digital (Salida) \\
+GPIO10--GPIO13 & SPI1 & LoRa Ra-02 (SCK, MOSI, MISO, CS) & Bus SPI \\
+GPIO27, GPIO28 & GPIO & LoRa DIO0 e Interrupción / Reset & Control Digital \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\section{Protocolo de Comunicación y Estructura MQTT}
+La comunicación entre el nodo RP2040 y el Gateway ESP32 utiliza tramas LoRa cifradas con AES-128 (modo ECB). Posteriormente, el Gateway publica la información procesada hacia el broker Mosquitto en la Raspberry Pi 5.
+
+\begin{table}[H]
+\centering
+\caption{Estructura de Tópicos MQTT y Payloads}
+\vspace{2mm}
+\begin{tabular}{lp{5.5cm}p{5.5cm}}
+\toprule
+\textbf{Tópico MQTT} & \textbf{Formato del Payload} & \textbf{Descripción y Uso} \\ \midrule
+\texttt{sensor/data/out} & \texttt{\{"read\_time": "...", "avg\_tds\_ppm": 4.5, "avg\_depth\_cm": 280.2, "tds\_load": 1, "depth\_load": 0\}} & Publicación del promedio acumulado (bloque de 20 muestras) o lecturas instantáneas. \\ \midrule
+\texttt{sensor/data/in} & \texttt{"tds/load/on"}, \texttt{"tds/load/off"}, \texttt{"depth/load/on"}, o JSON & Suscripción a comandos remotos recibidos desde la interfaz Web/Grafana. \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\section{Implementación de Software}
+A continuación se presentan los módulos principales de software implementados en MicroPython para el nodo perimetral RP2040 y el Gateway ESP32.
+
+\subsection{Firmware del Nodo Perimetral (RP2040)}
+El código cargado en la Raspberry Pi Pico realiza mediciones no bloqueantes, aplica cifrado AES-128 y conmuta las cargas en respuesta a comandos recibidos por LoRa.
+
+\begin{lstlisting}[language=Python,caption={Firmware completo del nodo sensor y actuador en RP2040 (\texttt{main.py})},label={lst:rp2040_py}]
+from machine import Pin, SPI, time_pulse_us, ADC, idle
+from lora_lib import LoRa
+import time
+import ujson
+import ucryptolib
+import ubinascii
+
+# ==========================================
+# CONFIGURACIÓN CRIPTOGRÁFICA (AES-128 ECB)
+# ==========================================
+AES_KEY = b"MiClaveSecreta16"
+
+def pad(texto):
+    pad_len = 16 - (len(texto) % 16)
+    return texto + bytes([pad_len]) * pad_len
+
+def unpad(texto):
+    pad_len = texto[-1]
+    if pad_len < 1 or pad_len > 16:
+        raise ValueError("Padding invalido")
+    return texto[:-pad_len]
+
+def cifrar_mensaje(mensaje_str):
+    cipher = ucryptolib.aes(AES_KEY, 1)  # 1 = ECB
+    cifrado_bytes = cipher.encrypt(pad(mensaje_str.encode('utf-8')))
+    return ubinascii.hexlify(cifrado_bytes).decode('utf-8')
+
+def descifrar_mensaje(mensaje_hex_str):
+    try:
+        cifrado_bytes = ubinascii.unhexlify(mensaje_hex_str)
+        cipher = ucryptolib.aes(AES_KEY, 1)
+        return unpad(cipher.decrypt(cifrado_bytes)).decode('utf-8')
+    except Exception as e:
+        print(f"Error descifrando: {e}")
+        return None
+
+# ==========================================
+# CONFIGURACIÓN SENSORES Y CARGAS
+# ==========================================
+trig = Pin(15, Pin.OUT)
+echo = Pin(14, Pin.IN)
+tds_sensor = ADC(Pin(26))
+
+carga_tds = Pin(16, Pin.OUT)
+carga_nivel = Pin(17, Pin.OUT)
+
+def medir_distancia(temperatura_c=20.0):
+    velocidad_cm_us = (331.3 + (0.6 * temperatura_c)) * 0.0001
+    trig.low(); time.sleep_us(5)
+    trig.high(); time.sleep_us(15); trig.low()
+    duracion = time_pulse_us(echo, 1, 30000)
+    if duracion > 0:
+        return (duracion * velocidad_cm_us) / 2.0
+    return -1
+
+def calcular_tds(valor_adc):
+    voltage = (valor_adc / 65535.0) * 3.3
+    tds_value = (133.42 * (voltage ** 3) - 255.86 * (voltage ** 2) + 857.39 * voltage) * 0.5
+    return max(0.0, tds_value)
+
+def timestamp_ms():
+    t = time.localtime()
+    try:
+        ms = (time.time_ns() // 1000000) % 1000
+    except Exception:
+        ms = time.ticks_ms() % 1000
+    return f"{t[0]:04d}-{t[1]:02d}-{t[2]:02d} {t[3]:02d}:{t[4]:02d}:{t[5]:02d}.{ms:03d}"
+
+# ==========================================
+# ESTADO NO BLOQUEANTE
+# ==========================================
+SEND_INTERVAL_MS = 3000
+TX_GUARD_MS = 200
+
+rx_queue = []
+rx_resume_at = None
+ultimo_envio_datos = time.ticks_add(time.ticks_ms(), -SEND_INTERVAL_MS)
+datos_exitosos = 0
+
+def al_recibir(dato):
+    if len(rx_queue) < 8:
+        rx_queue.append(dato)
+
+def transmitir(payload_hex):
+    global rx_resume_at
+    lora.send(payload_hex)
+    rx_resume_at = time.ticks_add(time.ticks_ms(), TX_GUARD_MS)
+
+# ==========================================
+# INICIALIZACIÓN LORA
+# ==========================================
+spi = SPI(1, baudrate=1000000, sck=Pin(10), mosi=Pin(11), miso=Pin(12))
+lora = LoRa(spi, cs=13, reset=28, dio0=27, callback=al_recibir)
+lora.set_bandwidth(250000)
+lora.set_rx_mode()
+
+print("--- INICIANDO SISTEMA RP2040 CIFRADO ---")
+
+def procesar_rx():
+    global datos_exitosos
+    while rx_queue:
+        dato_crudo = rx_queue.pop(0)
+        try:
+            texto_hex = dato_crudo.decode('utf-8') if isinstance(dato_crudo, (bytes, bytearray)) else str(dato_crudo)
+            texto_descifrado = descifrar_mensaje(texto_hex)
+            if not texto_descifrado:
+                continue
+
+            msg = ujson.loads(texto_descifrado)
+            tipo = msg.get("tipo")
+            if tipo == "ack":
+                datos_exitosos += 1
+            elif tipo == "comando":
+                valor_tds = msg.get("tds_load", 0)
+                valor_nivel = msg.get("depth_load", 0)
+                carga_tds.value(valor_tds)
+                carga_nivel.value(valor_nivel)
+        except Exception as e:
+            print("Error procesando trama entrante:", e)
+
+def enviar_datos():
+    dist = medir_distancia()
+    tds_ppm = calcular_tds(tds_sensor.read_u16())
+    datos = f"{timestamp_ms()} {round(tds_ppm, 1)} {round(dist, 1) if dist >= 0 else None}"
+    payload_cifrado = cifrar_mensaje(datos)
+    transmitir(payload_cifrado)
+
+while True:
+    ahora = time.ticks_ms()
+    if rx_resume_at is not None and time.ticks_diff(ahora, rx_resume_at) >= 0:
+        lora.set_rx_mode()
+        rx_resume_at = None
+
+    procesar_rx()
+
+    if rx_resume_at is None and time.ticks_diff(ahora, ultimo_envio_datos) >= SEND_INTERVAL_MS:
+        ultimo_envio_datos = ahora
+        enviar_datos()
+
+    idle()
+\end{lstlisting}
+
+\subsection{Firmware del Gateway (ESP32)}
+El Gateway puentea los paquetes LoRa cifrados hacia la red Wi-Fi mediante MQTT cifrado sobre TLS, acumulando bloques de 20 muestras antes de emitir decisiones de control local.
+
+\begin{lstlisting}[language=Python,caption={Firmware del Gateway ESP32 (Puente LoRa--MQTT)},label={lst:esp32_py}]
+import network, time, json, ucryptolib, ubinascii
+from machine import Pin, SPI
+from umqtt.simple import MQTTClient
+from lora_lib import LoRa
+
+WIFI_SSID = "IoT"
+WIFI_PASS = "EIJabcd1234"
+MQTT_BROKER = "192.168.0.115"
+MQTT_PORT = 8883
+MQTT_CLIENT_ID = "esp32smv"
+PUB_TOPIC = b"sensor/data/out"
+SUB_TOPIC = b"sensor/data/in"
+
+AES_KEY = b"MiClaveSecreta16"
+
+def unpad(data):
+    return data[:-data[-1]]
+
+def encrypt_message(msg_str):
+    cipher = ucryptolib.aes(AES_KEY, 1)
+    pad_len = 16 - (len(msg_str) % 16)
+    padded = msg_str.encode('utf-8') + bytes([pad_len]) * pad_len
+    return ubinascii.hexlify(cipher.encrypt(padded)).decode('utf-8')
+
+def decrypt_message(hex_str):
+    try:
+        cipher = ucryptolib.aes(AES_KEY, 1)
+        raw = ubinascii.unhexlify(hex_str.strip())
+        return unpad(cipher.decrypt(raw)).decode('utf-8')
+    except Exception as e:
+        return None
+
+MAX_MUESTRAS = 20
+historial_tds, historial_depth = [], []
+cmd_tds, cmd_depth = 0, 0
+
+def enviar_comando_lora():
+    global cmd_tds, cmd_depth
+    payload = json.dumps({"tipo": "comando", "tds_load": cmd_tds, "depth_load": cmd_depth})
+    time.sleep_ms(100)
+    lora.send(encrypt_message(payload))
+    lora.set_rx_mode()
+
+def connect_wifi():
+    wlan = network.WLAN(network.STA_IF)
+    wlan.active(True)
+    if not wlan.isconnected():
+        wlan.connect(WIFI_SSID, WIFI_PASS)
+        while not wlan.isconnected():
+            time.sleep(0.5)
+
+def lora_receive(msg):
+    global cmd_tds, cmd_depth, historial_tds, historial_depth
+    plain = decrypt_message(msg)
+    if plain is None: return
+    
+    date, _time, tds_str, depth_str = plain.split()
+    historial_tds.append(float(tds_str))
+    historial_depth.append(float(depth_str))
+    
+    if len(historial_tds) >= MAX_MUESTRAS:
+        prom_tds = sum(historial_tds) / MAX_MUESTRAS
+        prom_depth = sum(historial_depth) / MAX_MUESTRAS
+        cmd_tds = 1 if prom_tds <= 5.0 else 0
+        cmd_depth = 1 if prom_depth <= 300.0 else 0
+        
+        data_mqtt = {"read_time": f"{date} {_time}", "avg_tds_ppm": round(prom_tds,2), "avg_depth_cm": round(prom_depth,2), "tds_load": cmd_tds, "depth_load": cmd_depth}
+        client.publish(PUB_TOPIC, json.dumps(data_mqtt))
+        enviar_comando_lora()
+        historial_tds.clear(); historial_depth.clear()
+    else:
+        enviar_comando_lora()
+
+connect_wifi()
+client = MQTTClient(MQTT_CLIENT_ID, MQTT_BROKER, port=MQTT_PORT, ssl=True, ssl_params={"server_hostname": "localhost"})
+client.connect()
+client.subscribe(SUB_TOPIC)
+
+spi = SPI(2, baudrate=1000000, sck=Pin(14), mosi=Pin(13), miso=Pin(12))
+lora = LoRa(spi, cs=17, reset=5, dio0=6, callback=lora_receive)
+lora.set_rx_mode()
+
+while True:
+    client.check_msg()
+    time.sleep(0.1)
+\end{lstlisting}
+
+\section{Conclusiones y Recomendaciones}
+\begin{enumerate}[1.]
+    \item La migración hacia el procesador RP2040 en los nodos perimetrales proporciona un manejo determinista y preciso para los sensores de campo, mientras que la Raspberry Pi 5 ofrece la capacidad de cómputo necesaria para gestionar la pila de almacenamiento y análisis de datos sin cuellos de botella.
+    \item Es imperativo mantener el aislamiento galvánico mediante contactores/relés de alta calidad para evitar interferencias electromagnéticas (EMI) durante el arranque del motor de la bomba de recirculación de 110V AC.
+\end{enumerate}
+
+\end{document}

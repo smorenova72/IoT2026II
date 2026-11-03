@@ -1,0 +1,225 @@
+ %===============================================================================================================%
+%                   Estilo y paquetes que se van a utilizar: No es necesario editar                             %
+%===============================================================================================================%
+\documentclass[12pt,letterpaper]{article}     % Tipo de documento y otras especificaciones
+\usepackage[utf8]{inputenc}                   % Para escribir tildes y eñes
+\usepackage[spanish]{babel}                   % Para que los títulos de figuras, tablas y otros estén en español
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}					% Cambiar nombre a tablas
+\addto\captionsspanish{\renewcommand{\listtablename}{Índice de tablas}}		% Cambiar nombre a lista de tablas
+\usepackage{geometry}                         
+\geometry{left=18mm,right=18mm,top=21mm,bottom=21mm}	 % Tamaño del área de escritura de la página
+\usepackage{ucs}
+\usepackage{amsmath}      % Los paquetes ams son desarrollados por la American Mathematical Society
+\usepackage{amsfonts}     % y mejoran la escritura de fórmulas y símbolos matemáticos.
+\usepackage{tikz}
+
+\usetikzlibrary{babel}               % Se añade para que se acepten algunos caractéres en el circuitikz 
+\usepackage{circuitikz}
+\usepackage{graphicx}     % Para insertar gráficas
+\usepackage[lofdepth,lotdepth]{subfig}	% Para colocar varias figuras
+\usepackage{unitsdef}	  % Para la presentación correcta de unidades
+\usepackage{pdfpages}     % Incluir paginas de pdf externo, para los anexos
+\usepackage{appendix}     % Para los anexos
+\renewcommand{\unitvaluesep}{\hspace*{4pt}}	% Redimensionamiento del espacio entre magnitud y unidad
+\usepackage[colorlinks=true,urlcolor=blue,linkcolor=black,citecolor=red]{hyperref}     % Para insertar 				hipervínculos y marcadores
+\usepackage{float}		% Para ubicar las tablas y figuras justo después del texto
+\usepackage{booktabs}	% Para hacer tablas más estilizadas
+\batchmode
+\usepackage{apalike}
+\bibliographystyle{apalike}  % Bibliografía en formato IEEE
+\pagestyle{plain} 
+\pagenumbering{arabic}
+\usepackage{lastpage}
+\usepackage{skull}
+\usepackage{marvosym}
+\usepackage{fancyhdr}	% Para manejar los encabezados y pies de página
+\pagestyle{fancy}		% Contenido de los encabezados y pies de pagina
+\usepackage{multicol}   % Para varias columnas
+\usepackage{enumerate}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstset{
+  language=C++,
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{blue}\bfseries,
+  commentstyle=\color{gray}\ttfamily,
+  stringstyle=\color{red!70!black},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  stepnumber=1,
+  numbersep=5pt,
+  backgroundcolor=\color{gray!10},
+  frame=single,
+  rulecolor=\color{black},
+  captionpos=b,
+  breaklines=true,
+  breakatwhitespace=false,
+  tabsize=2,
+  showstringspaces=false
+}
+
+%===============================================================================================================%
+%                         Definición del ambiente: Resumen --> No es necesario modificar                        %                                        
+%===============================================================================================================%
+\newcounter{resumen}
+\setcounter{resumen}{0}
+\def\theejemplo{\thechapter.\arabic{resumen}}
+
+\newenvironment{resumen}
+{	
+	\begin{center}
+	\begin{minipage}[t]{500 pt}
+	\vspace{1mm}
+	\emph{\textbf{}}
+	\\[-2mm]
+	\line(1,0){500}
+	\\[-4.25 mm]
+	\line(1,0){500}
+	\\
+}
+{
+	\normalsize
+	\\[2mm]
+	\footnotesize\textbf{Palabras clave: \footnotesize\@palabras}
+	\\[-2mm]
+	\line(1,0){500}
+	\\[0.5cm]
+	\end{minipage}
+	\end{center}
+}
+
+%===============================================================================================================%
+%                         Definición del ambiente: Palabras clave --> No es necesario modificar                 %                                                               
+%===============================================================================================================%
+\def\palabras#1{\gdef\@palabras{#1}}
+
+%===============================================================================================================%
+%             Definición de encabezados --> Modificar de acuerdo al número de laboratorio (o materia)           %                                                                          
+%===============================================================================================================%
+\lhead{IoT} % Codigo de la materia de circuitos 1
+\chead{}
+\rhead{Manual de Usuario}	% Aquí va el número de Laboratorio, al igual que en el titulo
+\lfoot{Programa de Ingeniería Electrónica y Sistemas}
+\cfoot{\thepage\ de \pageref{LastPage}}
+\rfoot{Universidad Católica de Oriente}
+
+%===============================================================================================================%
+% Portada --> Modificar de acuerdo al número de laboratorio, materia, grupo de trabajo, docente, estudiantes y  %    %                                       respectivas identificaciones                                            %                                                                          
+%===============================================================================================================%
+\author{Santiago Barbarán, 1001159841\\Miguel Ángel Botero,1023523241 \\ Sebastián Moreno Vargas, 1001724352\\Profesor: Juan Camilo Acevedo \vspace*{2.8in}} % Pendiente de modificar el grupo y/o agregar compañero
+\title{
+\begin{minipage}{\textwidth}
+\centering
+	\includegraphics[width=0.3\textwidth]{uco.png}
+	\bigskip
+\end{minipage}\\
+Universidad Católica de Oriente \\{\small Facultad de Ingeniería\\Programa de Ingeniería Electrónica y Sistemas\\ Informe IoT\\Semestre 2026-II\\\vspace*{0.55in} Informe:}\\  Manual de Usuario \vspace*{1.35in}}
+
+\begin{document}	% Inicio del documento
+
+\pdfbookmark[1]{Portada}{portada} 	% Marcador para el título, no editar
+
+\maketitle							% Título, no editar
+\thispagestyle{empty}
+
+\tableofcontents         % Tabla de contenidos, no editar, se crea automáticamente
+%\newpage
+%\listoffigures           % Lista de figuras, no editar, se crea automáticamente
+%\listoftables            % Lista de tablas, no editar, se crea automáticamente
+
+\newpage
+
+%===============================================================================================================%
+%                            Resumen --> Introducir resumen del laboratorio                                     %                                                                          
+\section{Introducción y descripción general}
+
+Bienvenido al Manual de Usuario del sistema de monitoreo y control autónomo de calidad de agua para piscicultura. Este sistema ha sido diseñado para supervisar de forma continua y automática los parámetros del agua de los estanques (nivel y calidad mediante sólidos disueltos totales / conductividad), buscando tener condiciones idóneas para la supervivencia y salud de la biomasa de peces.
+
+El sistema funciona de forma autónoma realizando acciones preventivas (activación de bomba de recirculación y electroválvula de recambio hídrico) y permitiendo a los operadores monitorear el estado del estanque desde una interfaz web accesible.\\
+
+\section{Acceso a la plataforma de monitoreo}
+
+Para consultar el estado del estanque y visualizar métricas históricas, siga estos pasos:\\
+
+\begin{itemize}
+    \item \textbf{Conexión a la red local:} Asegúrese de que su dispositivo esté conectado a la red local del criadero.
+
+    \item \textbf{Ingreso al Dashboard:} Abra un navegador y en la barra de direcciones, ingrese la dirección IP asignada al servidor del sistema seguido del puerto 3000.
+    \item \textbf{Credenciales:} Ingrese su usuario y contraseña asignados por el administrador para acceder al panel principal de Grafana.
+\end{itemize}
+
+\section{Interpretación de la Dashboard}
+\begin{itemize}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{SDT.png}
+    \caption{Historial SDT}
+\end{figure}
+
+    \item \textbf{Gráfica de Historial (SDT):} En esta gráfica podrá ver la tendencia y variaciones continuas de la concentración de sólidos disueltos a lo largo del tiempo, lo que le permitirá identificar cambios bruscos o picos en la calidad del agua.
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Profundidad.png}
+    \caption{Historial Profundidad}
+    \label{fig:placeholder}
+\end{figure}
+\item \textbf{Gráfica de Historial (Profundidad):}En este apartado podrá consultar el comportamiento del nivel del estanque a lo largo de la jornada. Le servirá para detectar caídas de nivel, descensos drásticos o confirmar cuando los ciclos automáticos de vaciado y llenado estén operando.
+
+\end{itemize}
+\section{Operación del sistema y lógica autónoma}
+El sistema EcoSmart UCO no requiere intervención manual constante para regular el agua. Su lógica interna actúa de la siguiente manera:
+
+\begin{enumerate}
+    \item \textbf{Recirculación Automática:} Si la calidad del agua o el oxígeno disuelto se salen de los intervalos establecidos, el sistema enciende automáticamente la bomba de recirculación de 110V para oxigenar el medio.
+    \item \textbf{Ciclos de Vaciado e Ingreso}: Si los valores de conductividad/SDT superan el umbral máximo tolerado por los peces, se acciona las electroválvulas para drenar un porcentaje del agua acumulada e ingresar agua limpia.
+\end{enumerate}
+
+\section{Resolución de problemas frecuentes}
+\begin{enumerate}
+ 
+
+
+            \item \textbf{Problema:} El Dashboard no carga en el navegador.
+            \begin{itemize}
+                \item \textbf{Causa Probable:} Apagado de la Raspberry Pi 5.
+                \item \textbf{Solución:} Verifique que el LED de encendido de la Raspberry Pi 5 esté activo y fijo.
+                
+            \end{itemize}
+            
+            \vspace{0.5cm}
+            
+            \item \textbf{Problema:} El nivel de agua muestra un valor estático o erróneo.
+            \begin{itemize}
+                \item \textbf{Causa Probable:} Obstrucción o suciedad en la sonda ultrasónica).
+                \item \textbf{Solución:} Verifique que la sonda montada sobre el estanque no tenga objetos, algas ni suciedad en la superficie cónica de medición.
+            \end{itemize}
+            
+            \vspace{0.5cm}
+            
+            \item \textbf{Problema:} Las lecturas de conductividad oscilan bruscamente.
+            \begin{itemize}
+                \item \textbf{Causa Probable:} Electrodo sucio o sedimentación en las puntas de prueba del sensor.
+                \item \textbf{Solución:} Limpie suavemente las puntas del sensor utilizando agua destilada o agua limpia, evitando frotar con materiales abrasivos.
+            \end{itemize}
+            
+            \vspace{0.5cm}
+            
+
+\end{enumerate}
+
+\section{Precauciones de seguridad operacional}
+\begin{itemize}
+    \item Seguridad Eléctrica: No manipule los gabinetes metálicos ni la caja de los contactores/relés de 110V con las manos mojadas o descalzo.
+
+    \item Limpieza de Sensores: Realice inspecciones visuales semanales a los sensores en el estanque para retirar hojas, ramas o acumulación de algas.
+
+
+\end{itemize}
+
+\end{document} 
+
