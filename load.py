@@ -2,8 +2,8 @@ import tkinter as tk
 import paho.mqtt.client as mqtt
 import ssl
 
-BROKER   = "localhost"
-PORT     = 1883
+BROKER   = "192.168.0.115"
+PORT     = 8883
 USER     = "bug"
 PASSWORD = "777"
 PUB_TOPIC    = "sensor/data/in"
@@ -18,24 +18,24 @@ state = {
 def update_tds():
     state["tds"] = not state["tds"]
     tds_button.config(relief="sunken" if state["tds"] == True else "raised", bg="green" if state["tds"] == True else "red")
-    client.publish(PUB_TOPIC, "load/tds/on" if state["tds"] == True else "load/tds/off")
+    client.publish(PUB_TOPIC, "tds/load/on" if state["tds"] == True else "tds/load/off")
 
 
 def update_level():
     state["level"] = not state["level"]
     level_button.config(relief="sunken" if state["level"] == True else "raised", bg="green" if state["level"] == True else "red")
-    client.publish(PUB_TOPIC, "load/level/on" if state["level"] == True else "load/level/off")
+    client.publish(PUB_TOPIC, "nivel/load/on" if state["level"] == True else "nivel/load/off")
 
-def on_connect(_c, _u, _f, _r, _p):
+def on_connect(_c, _u, _f, _r):
     print("Connected")
 
-def on_disconnect(_c, _u, _f, _r, _p):
+def on_disconnect(_c, _u, _f, _r):
     print("Disconnected")
 
-client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="control_panel")
-# client.username_pw_set(USER, PASSWORD)
-# client.tls_set(ca_certs=CA_CERT)
-# client.tls_insecure_set(SKIP_HOSTNAME_CHECK)
+client = mqtt.Client(client_id="control_panel")
+client.username_pw_set(USER, PASSWORD)
+client.tls_set(ca_certs=CA_CERT)
+client.tls_insecure_set(SKIP_HOSTNAME_CHECK)
 client.on_connect = on_connect
 client.on_disconnect = on_disconnect
 
