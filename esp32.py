@@ -7,9 +7,6 @@ from machine import Pin, SPI
 from umqtt.simple import MQTTClient
 from lora_lib import LoRa
 
-# ----------------------------------------------------------------#
-# CONFIGURACIÓN WI-FI Y MQTT
-# ----------------------------------------------------------------#
 WIFI_SSID = "IoT"
 WIFI_PASS = "EIJabcd1234"
 
@@ -23,9 +20,6 @@ SUB_TOPIC = b"sensor/data/in"
 MQTT_USER     = 'bug'
 MQTT_PASSWORD = '777'
 
-# ----------------------------------------------------------------#
-# CONFIGURACIÓN DE CIFRADO AES-128 (ECB)
-# ----------------------------------------------------------------#
 AES_KEY = b"MiClaveSecreta16"
 
 def pad(data):
@@ -54,18 +48,15 @@ def decrypt_message(hex_str):
         print("Error de descifrado:", e)
         return None
 
-# ----------------------------------------------------------------#
-# ACUMULADOR DE 20 MUESTRAS Y ESTADOS ESTÁTICOS
-# ----------------------------------------------------------------#
 MAX_MUESTRAS = 20
 historial_tds = []
 historial_depth = []
 
-cmd_tds = 0    # Orden estática (0: Apagado, 1: Encendido)
-cmd_depth = 0  # Orden estática (0: Apagado, 1: Encendido)
+cmd_tds = 0
+cmd_depth = 0
 
-UMBRAL_TDS_MAX = 5.0     # Si promedio TDS <= 5.0 activa carga
-UMBRAL_DEPTH_MAX = 300.0 # Si promedio Nivel <= 300.0 activa carga
+UMBRAL_TDS_MAX = 5.0
+UMBRAL_DEPTH_MAX = 300.0
 
 def enviar_comando_lora():
     """Envía el estado actual de las cargas cifrado vía LoRa al RP2040."""
@@ -76,15 +67,12 @@ def enviar_comando_lora():
         "depth_load": cmd_depth
     })
     
-    time.sleep_ms(100)  # Evita colisión de transmisión en el canal LoRa
+    time.sleep_ms(100)
     enc_payload = encrypt_message(payload)
     lora.send(enc_payload)
     lora.set_rx_mode()
     print(f"[LoRa TX -> RP2040] Orden enviada al RP2040: TDS={cmd_tds}, Nivel={cmd_depth}")
 
-# ----------------------------------------------------------------#
-# CONEXIÓN Y CALLBACKS
-# ----------------------------------------------------------------#
 def connect_wifi():
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
@@ -124,7 +112,6 @@ def on_message_received(topic, msg):
             print("Formato MQTT no reconocido.")
             return
 
-        # Ante un comando directo del servidor, se envía la actualización al RP2040 inmediatamente
         enviar_comando_lora()
 
     except Exception as e:
@@ -134,26 +121,21 @@ def lora_receive(msg):
     """Procesa los paquetes de sensores y solo toma/envía decisiones al llegar a 20 muestras."""
     global cmd_tds, cmd_depth, historial_tds, historial_depth
     try:
-        # 1. Descifrar el paquete recibido desde el RP2040
         plain = decrypt_message(msg)
         if plain is None:
             return
 
-        # 2. Parsear lectura de la trama
         date, _time, tds_str, depth_str = plain.split()
         tds_val = float(tds_str)
         depth_val = float(depth_str)
 
-        # 3. Guardar lecturas en el historial
         historial_tds.append(tds_val)
         historial_depth.append(depth_val)
         num_muestras = len(historial_tds)
 
         print(f"\n[LoRa RX <- RP2040] Lectura {num_muestras}/{MAX_MUESTRAS} -> TDS: {tds_val} ppm | Nivel: {depth_val} cm")
 
-        # 4. CONDICIONAL: ¿Se completó el bloque de 20 muestras?
         if num_muestras >= MAX_MUESTRAS:
-            # Calcular promedios de las 20 muestras
             prom_tds = sum(historial_tds) / MAX_MUESTRAS
             prom_depth = sum(historial_depth) / MAX_MUESTRAS
 
@@ -164,7 +146,6 @@ def lora_receive(msg):
             cmd_tds = 1 if prom_tds <= UMBRAL_TDS_MAX else 0
             cmd_depth = 1 if prom_depth <= UMBRAL_DEPTH_MAX else 0
 
-            # Publicar en broker MQTT el reporte completo del bloque de 20 datos
             data_mqtt = {
                 "read_time": f"{date} {_time}",
                 "avg_tds_ppm": round(prom_tds, 2),
@@ -176,15 +157,12 @@ def lora_receive(msg):
             }
             client.publish(PUB_TOPIC, json.dumps(data_mqtt))
 
-            # ENVIAR NUEVA ORDEN POR LORA AL RP2040
             enviar_comando_lora()
 
-            # Reiniciar lista acumuladora para los próximos 20 datos
             historial_tds.clear()
             historial_depth.clear()
 
         else:
-            # MUESTRAS 1 A 19: Mantener la orden estática previa y responder ACK simple
             data_instant = {
                 "read_time": f"{date} {_time}",
                 "tds_ppm": tds_val,
@@ -195,15 +173,11 @@ def lora_receive(msg):
             }
             client.publish(PUB_TOPIC, json.dumps(data_instant))
 
-            # Se confirma recepción al RP2040 retransmitiendo la orden estática actual
             enviar_comando_lora()
 
     except Exception as e:
         print("Error en recepción/procesamiento LoRa:", e)
 
-# ----------------------------------------------------------------#
-# INICIALIZACIÓN DE RED Y LORA
-# ----------------------------------------------------------------#
 connect_wifi()
 
 with open("ca.crt", "r") as f:
@@ -235,9 +209,6 @@ lora.set_bandwidth(250000)
 lora.set_rx_mode()
 print("LoRa listo y escuchando...")
 
-# ----------------------------------------------------------------#
-# BUCLE PRINCIPAL
-# ----------------------------------------------------------------#
 try:
     while True:
         client.check_msg()
