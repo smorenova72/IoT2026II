@@ -98,9 +98,9 @@ def on_message_received(topic, msg):
             cmd_tds = 1
         elif msg_str == "tds/load/off":
             cmd_tds = 0
-        elif msg_str in ("depth/load/on", "nivel/load/on"):
+        elif msg_str in ("nivel/load/on", "nivel/load/on"):
             cmd_depth = 1
-        elif msg_str in ("depth/load/off", "nivel/load/off"):
+        elif msg_str in ("nivel/load/off", "nivel/load/off"):
             cmd_depth = 0
         elif msg_str.startswith("{"):
             data = json.loads(msg_str)
