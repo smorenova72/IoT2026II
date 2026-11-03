@@ -1,0 +1,41 @@
+services:
+
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+    restart: unless-stopped
+    ports:
+      - "8883:8883"
+    volumes:
+      - ./mosquitto:/mosquitto/
+
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: 777
+      MARIADB_DATABASE: iot
+      MARIADB_USER: bug
+      MARIADB_PASSWORD: 777
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=bug
+      - GF_SECURITY_ADMIN_PASSWORD=777
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+volumes:
+  mariadb_data:
+  grafana_data:
